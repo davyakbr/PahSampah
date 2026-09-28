@@ -12,7 +12,6 @@ async function main() {
   console.log("🌱 Seeding database with 3 default waste types...");
 
   await prisma.logAktivitas.deleteMany({});
-  await prisma.ulasanLaporan.deleteMany({});
   await prisma.logPoin.deleteMany({});
   await prisma.penukaranVoucher.deleteMany({});
   await prisma.voucher.deleteMany({});
@@ -47,15 +46,33 @@ async function main() {
   );
   console.log(`✅ 2. ${jenisSampahList.length} default JenisSampah created (Organik, Non Organik, B3)`);
 
-  // 3. Wilayah
+  // 3. Wilayah (Seluruh Kota & Kabupaten di Pulau Jawa)
   const wilayahNames = [
-    "Jakarta Pusat", "Jakarta Utara", "Jakarta Selatan",
-    "Jakarta Timur", "Jakarta Barat", "Bogor", "Depok", "Tangerang", "Bekasi",
+    // DKI Jakarta
+    "Jakarta Barat", "Jakarta Pusat", "Jakarta Selatan", "Jakarta Timur", "Jakarta Utara", "Kepulauan Seribu",
+    // Banten
+    "Cilegon", "Lebak", "Pandeglang", "Serang", "Tangerang", "Tangerang Selatan",
+    // Jawa Barat
+    "Bandung", "Bandung Barat", "Banjar", "Bekasi", "Bogor", "Ciamis", "Cianjur", "Cimahi", "Cirebon",
+    "Depok", "Garut", "Indramayu", "Karawang", "Kuningan", "Majalengka", "Pangandaran", "Purwakarta",
+    "Subang", "Sukabumi", "Sumedang", "Tasikmalaya",
+    // Jawa Tengah
+    "Banjarnegara", "Banyumas (Purwokerto)", "Batang", "Blora", "Boyolali", "Brebes", "Cilacap", "Demak",
+    "Grobogan (Purwodadi)", "Jepara", "Karanganyar", "Kebumen", "Kendal", "Klaten", "Kudus", "Magelang",
+    "Pati", "Pekalongan", "Pemalang", "Purbalingga", "Purworejo", "Rembang", "Salatiga", "Semarang",
+    "Sragen", "Sukoharjo", "Surakarta (Solo)", "Tegal", "Temanggung", "Wonogiri", "Wonosobo",
+    // D.I. Yogyakarta
+    "Bantul", "Gunungkidul", "Kulon Progo", "Sleman", "Yogyakarta",
+    // Jawa Timur
+    "Bangkalan", "Banyuwangi", "Batu", "Blitar", "Bojonegoro", "Bondowoso", "Gresik", "Jember", "Jombang",
+    "Kediri", "Lamongan", "Lumajang", "Madiun", "Magetan", "Malang", "Mojokerto", "Nganjuk", "Ngawi",
+    "Pacitan", "Pamekasan", "Pasuruan", "Ponorogo", "Probolinggo", "Sampang", "Sidoarjo", "Situbondo",
+    "Sumenep", "Surabaya", "Trenggalek", "Tuban", "Tulungagung"
   ];
   const wilayahList = await Promise.all(
     wilayahNames.map((namaWilayah) => prisma.wilayah.create({ data: { namaWilayah } }))
   );
-  console.log(`✅ 3. ${wilayahList.length} Wilayah created`);
+  console.log(`✅ 3. ${wilayahList.length} Wilayah se-Pulau Jawa created`);
 
   // 4. LaporanSampah
   const jakPusat = wilayahList.find((w) => w.namaWilayah === "Jakarta Pusat")!;
@@ -147,18 +164,7 @@ async function main() {
   });
   console.log("✅ 8. LogPoin created");
 
-  // 9. UlasanLaporan
-  await prisma.ulasanLaporan.create({
-    data: {
-      userId: budi.id,
-      laporanId: lap1.id,
-      rating: 5,
-      komentar: "Pengambilan sangat cepat dan petugas ramah!",
-    },
-  });
-  console.log("✅ 9. UlasanLaporan created");
-
-  // 10. LogAktivitas
+  // 9. LogAktivitas
   await prisma.logAktivitas.create({
     data: {
       userId: budi.id,

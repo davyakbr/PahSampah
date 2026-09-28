@@ -3,7 +3,7 @@
 import React, { useActionState, useEffect, useState } from "react";
 import { addLocationAction, deleteLocationAction } from "@/app/actions/location";
 import { useToast } from "@/components/providers/ToastProvider";
-import { Plus, Trash2, MapPin } from "lucide-react";
+import { Plus, Trash2, MapPin, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface WilayahItem {
@@ -17,6 +17,11 @@ export default function LocationsClient({ locations }: { locations: WilayahItem[
   const { showToast } = useToast();
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const filteredLocations = locations.filter((loc) =>
+    loc.namaWilayah.toLowerCase().includes(search.toLowerCase().trim())
+  );
 
   useEffect(() => {
     if (state?.error) showToast(state.error, "error");
@@ -70,16 +75,33 @@ export default function LocationsClient({ locations }: { locations: WilayahItem[
       </div>
 
       <div className="bg-white rounded-2xl border-2 border-slate-100 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b-2 border-slate-100 bg-slate-50 flex justify-between items-center">
+        <div className="px-6 py-4 border-b-2 border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <span className="text-xs font-black uppercase tracking-wider text-slate-500">
             Daftar Wilayah ({locations.length})
+            {search && (
+              <span className="ml-2 text-violet-600 font-bold normal-case">
+                · Ditemukan {filteredLocations.length} hasil
+              </span>
+            )}
           </span>
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari wilayah/kota..."
+              className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-violet-400 transition-colors"
+            />
+          </div>
         </div>
-        <div className="divide-y divide-slate-100">
-          {locations.length === 0 ? (
-            <p className="p-8 text-center text-slate-400 font-bold text-sm">Belum ada wilayah.</p>
+        <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+          {filteredLocations.length === 0 ? (
+            <p className="p-8 text-center text-slate-400 font-bold text-sm">
+              {search ? `Tidak ada wilayah yang cocok dengan "${search}".` : "Belum ada wilayah."}
+            </p>
           ) : (
-            locations.map((loc) => (
+            filteredLocations.map((loc) => (
               <div key={loc.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center flex-shrink-0">
