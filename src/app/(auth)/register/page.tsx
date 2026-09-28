@@ -53,7 +53,6 @@ export default function RegisterPage() {
                 name="name"
                 id="register_name"
                 required
-                placeholder="Budi Setiawan"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>
@@ -72,7 +71,6 @@ export default function RegisterPage() {
                 name="email"
                 id="register_email"
                 required
-                placeholder="nama@email.com"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>
@@ -91,7 +89,6 @@ export default function RegisterPage() {
                 name="noHp"
                 id="register_noHp"
                 required
-                placeholder="081234567890"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>
@@ -110,7 +107,6 @@ export default function RegisterPage() {
                 name="password"
                 id="register_password"
                 required
-                placeholder="••••••••"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>

@@ -37,13 +37,20 @@ export default async function DashboardPage() {
   const session = await getSession();
   const isAdmin = session?.role === "ADMIN";
 
+  const userFilter = !isAdmin && session ? { userId: session.id } : {};
+
   const [totalWastes, weightAgg, totalUsers, statusGroup, recentWastes, userPoints] =
     await Promise.all([
-      db.laporanSampah.count(),
-      db.laporanSampah.aggregate({ _sum: { berat: true } }),
-      db.user.count(),
-      db.laporanSampah.groupBy({ by: ["status"], _count: { id: true } }),
+      db.laporanSampah.count({ where: userFilter }),
+      db.laporanSampah.aggregate({ where: userFilter, _sum: { berat: true } }),
+      isAdmin ? db.user.count() : Promise.resolve(0),
+      db.laporanSampah.groupBy({
+        where: userFilter,
+        by: ["status"],
+        _count: { id: true },
+      }),
       db.laporanSampah.findMany({
+        where: userFilter,
         take: 5,
         orderBy: { createdAt: "desc" },
         include: {
@@ -167,7 +174,17 @@ export default async function DashboardPage() {
 
         <div className="divide-y divide-slate-100">
           {recentWastes.length === 0 ? (
-            <p className="py-8 text-center text-slate-400 font-bold text-sm">Belum ada laporan sampah.</p>
+            <div className="py-10 text-center space-y-3">
+              <p className="text-slate-400 font-bold text-sm">Belum ada laporan sampah.</p>
+              {!isAdmin && (
+                <Link
+                  href="/dashboard/waste/new"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 py-2 px-3.5 rounded-xl transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Setor Sampah Pertama Anda
+                </Link>
+              )}
+            </div>
           ) : (
             recentWastes.map((w) => {
               const cat = CATEGORY_THEMES[w.jenisSampah.category] ?? CATEGORY_THEMES.ORGANIK;

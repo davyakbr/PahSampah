@@ -53,7 +53,6 @@ export default function LoginPage() {
                 name="email"
                 id="login_email"
                 required
-                placeholder="nama@email.com"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>
@@ -72,7 +71,6 @@ export default function LoginPage() {
                 name="password"
                 id="login_password"
                 required
-                placeholder="••••••••"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 font-semibold text-sm focus:outline-none focus:bg-white focus:border-emerald-400 transition-all"
               />
             </div>
