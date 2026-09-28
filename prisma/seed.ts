@@ -4,7 +4,12 @@ import pg from "pg";
 import * as bcrypt from "bcryptjs";
 import "dotenv/config";
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const connectionString = process.env.DATABASE_URL;
+const isLocal = !connectionString || connectionString.includes("localhost") || connectionString.includes("127.0.0.1");
+const pool = new pg.Pool({
+  connectionString,
+  ssl: isLocal ? false : { rejectUnauthorized: false },
+});
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
