@@ -7,7 +7,7 @@ import * as bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
 export async function loginAction(prevState: any, formData: FormData) {
-  const email = formData.get("email") as string;
+  const email = (formData.get("email") as string)?.trim().toLowerCase();
   const password = formData.get("password") as string;
 
   const result = loginSchema.safeParse({ email, password });
@@ -50,7 +50,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     console.error("Login error:", error);
     return {
       success: false,
-      error: "Terjadi kesalahan pada server.",
+      error: "Terjadi kesalahan pada server saat masuk. Silakan coba lagi.",
     };
   }
 
@@ -60,9 +60,9 @@ export async function loginAction(prevState: any, formData: FormData) {
 }
 
 export async function registerAction(prevState: any, formData: FormData) {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const noHp = formData.get("noHp") as string;
+  const name = (formData.get("name") as string)?.trim();
+  const email = (formData.get("email") as string)?.trim().toLowerCase();
+  const noHp = (formData.get("noHp") as string)?.trim();
   const password = formData.get("password") as string;
 
   const result = registerSchema.safeParse({ name, email, noHp, password });
@@ -113,11 +113,24 @@ export async function registerAction(prevState: any, formData: FormData) {
       role: user.role,
     });
     isSuccess = true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Register error:", error);
+
+    // Handle Prisma unique constraint error
+    if (error?.code === "P2002") {
+      const target = error?.meta?.target;
+      if (Array.isArray(target) && target.includes("email")) {
+        return { success: false, error: "Email sudah terdaftar." };
+      }
+      if (Array.isArray(target) && target.includes("noHp")) {
+        return { success: false, error: "Nomor HP sudah terdaftar." };
+      }
+      return { success: false, error: "Email atau nomor HP sudah terdaftar." };
+    }
+
     return {
       success: false,
-      error: "Terjadi kesalahan pada server.",
+      error: "Terjadi kesalahan pada koneksi server. Silakan coba sesaat lagi.",
     };
   }
 

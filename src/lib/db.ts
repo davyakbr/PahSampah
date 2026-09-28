@@ -9,6 +9,9 @@ const isLocal = !connectionString || connectionString.includes("localhost") || c
 const poolConfig: pg.PoolConfig = {
   connectionString,
   ssl: isLocal ? false : { rejectUnauthorized: false },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 };
 
 const globalForPrisma = global as unknown as {
@@ -16,24 +19,20 @@ const globalForPrisma = global as unknown as {
   pool: pg.Pool | undefined;
 };
 
-let prismaInstance: PrismaClient;
-let poolInstance: pg.Pool;
-
-if (process.env.NODE_ENV === "production") {
-  poolInstance = new pg.Pool(poolConfig);
-  const adapter = new PrismaPg(poolInstance);
-  prismaInstance = new PrismaClient({ adapter });
-} else {
-  if (!globalForPrisma.pool) {
-    globalForPrisma.pool = new pg.Pool(poolConfig);
-  }
-  poolInstance = globalForPrisma.pool;
-
-  if (!globalForPrisma.prisma) {
-    const adapter = new PrismaPg(poolInstance);
-    globalForPrisma.prisma = new PrismaClient({ adapter });
-  }
-  prismaInstance = globalForPrisma.prisma;
+if (!globalForPrisma.pool) {
+  const pool = new pg.Pool(poolConfig);
+  pool.on("error", (err) => {
+    console.error("Unexpected error on idle pg client:", err);
+  });
+  globalForPrisma.pool = pool;
 }
 
-export const db = prismaInstance;
+const poolInstance = globalForPrisma.pool;
+
+if (!globalForPrisma.prisma) {
+  const adapter = new PrismaPg(poolInstance);
+  globalForPrisma.prisma = new PrismaClient({ adapter });
+}
+
+export const db = globalForPrisma.prisma;
+
