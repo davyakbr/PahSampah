@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #4ade80; /* Pastel Green */
+  --color-primary-hover: #22c55e;
+}
+
+/* =========================================
+   LIGHT PASTEL THEME — NO DARK MODE
+   ========================================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fffe;
+  --foreground: #1e3a2f;
+  --card-bg: #ffffff;
+  --card-border: #d1fae5;
+  --text-muted: #6b7280;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #d1fae5;
+  --input-bg: #ffffff;
+  --input-border: #a7f3d0;
+
+  /* Admin accent — soft violet/purple */
+  --admin-primary: #a78bfa;
+  --admin-primary-hover: #8b5cf6;
+  --admin-sidebar-bg: #faf5ff;
+  --admin-sidebar-border: #e9d5ff;
+  --admin-accent: #7c3aed;
+
+  /* User accent — soft teal/cyan */
+  --user-primary: #34d399;
+  --user-primary-hover: #10b981;
+  --user-sidebar-bg: #f0fdf4;
+  --user-sidebar-border: #bbf7d0;
+  --user-accent: #059669;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Prevent dark mode from ever activating */
+html { color-scheme: light only; }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  font-size: 15px;
 }
+
+/* =========================================
+   UTILITY CLASSES
+   ========================================= */
+.bg-theme    { background-color: var(--background); }
+.text-theme  { color: var(--foreground); }
+.card-theme  { background-color: var(--card-bg); }
+
+.sidebar-theme {
+  background-color: var(--sidebar-bg);
+  border-right: 2px solid var(--sidebar-border);
+}
+
+.input-theme {
+  background-color: var(--input-bg);
+  border: 2px solid var(--input-border);
+  color: var(--foreground);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.15s;
+}
+.input-theme:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+}
+
+/* Admin role sidebar theme */
+.sidebar-admin {
+  background: linear-gradient(180deg, #faf5ff 0%, #ede9fe 100%);
+  border-right: 2px solid #e9d5ff;
+}
+
+/* User role sidebar theme */
+.sidebar-user {
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+  border-right: 2px solid #bbf7d0;
+}
+
+/* =========================================
+   SCROLLBAR
+   ========================================= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1fae5; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #a7f3d0; }
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.25s ease-out forwards; }
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 4s linear infinite; }

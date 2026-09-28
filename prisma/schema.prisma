@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum WasteCategory {
+  ORGANIK
+  ANORGANIK
+  B3
+}
+
+enum WasteStatus {
+  PENDING
+  DIPROSES
+  SELESAI
+}
+
+// 1. Model User
+model User {
+  id               String             @id @default(uuid())
+  nama             String
+  email            String             @unique
+  noHp             String             @unique
+  password         String
+  role             Role               @default(USER)
+  points           Int                @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  laporanSampah    LaporanSampah[]
+  penukaranVoucher PenukaranVoucher[]
+  logPoin          LogPoin[]
+  logAktivitas     LogAktivitas[]
+
+  @@map("users")
+}
+
+// 2. Model JenisSampah
+model JenisSampah {
+  id            String          @id @default(uuid())
+  namaJenis     String          @unique
+  category      WasteCategory   @default(ORGANIK)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  laporanSampah LaporanSampah[]
+
+  @@map("jenis_sampah")
+}
+
+// 3. Model Wilayah
+model Wilayah {
+  id            String          @id @default(uuid())
+  namaWilayah   String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  laporanSampah LaporanSampah[]
+
+  @@map("wilayah")
+}
+
+// 4. Model LaporanSampah
+model LaporanSampah {
+  id            String          @id @default(uuid())
+  deskripsi     String
+  berat         Float
+  status        WasteStatus     @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  jenisSampahId String
+  jenisSampah   JenisSampah     @relation(fields: [jenisSampahId], references: [id], onDelete: Restrict)
+
+  wilayahId     String
+  wilayah       Wilayah         @relation(fields: [wilayahId], references: [id], onDelete: Restrict)
+
+  fotoSampah    FotoSampah?
+
+  @@map("laporan_sampah")
+}
+
+// 5. Model FotoSampah (One-to-One dengan LaporanSampah)
+model FotoSampah {
+  id            String        @id @default(uuid())
+  urlFoto       String
+  createdAt     DateTime      @default(now())
+
+  laporanId     String        @unique
+  laporanSampah LaporanSampah @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+
+  @@map("foto_sampah")
+}
+
+// 6. Model Voucher
+model Voucher {
+  id               String             @id @default(uuid())
+  judul            String
+  deskripsi        String?
+  kodeVoucher      String             @unique
+  biayaPoin        Int
+  stok             Int                @default(100)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  penukaranVoucher PenukaranVoucher[]
+
+  @@map("vouchers")
+}
+
+// 7. Model PenukaranVoucher
+model PenukaranVoucher {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  voucherId     String
+  voucher       Voucher  @relation(fields: [voucherId], references: [id], onDelete: Restrict)
+
+  @@map("penukaran_vouchers")
+}
+
+// 8. Model LogPoin
+model LogPoin {
+  id            String   @id @default(uuid())
+  jumlahPoin    Int
+  tipe          String   // "MASUK" (dapat dari laporan) atau "KELUAR" (tukar voucher)
+  keterangan    String
+  createdAt     DateTime @default(now())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("log_poin")
+}
+
+// 9. Model LogAktivitas
+model LogAktivitas {
+  id            String   @id @default(uuid())
+  aktivitas     String
+  createdAt     DateTime @default(now())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("log_aktivitas")
+}
